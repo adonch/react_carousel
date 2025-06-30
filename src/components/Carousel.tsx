@@ -38,8 +38,10 @@ const Carousel: React.FC<Props> = ({
     let newOffset =
       direction === Direction.next ? offset + step : offset - step;
 
-    if (newOffset >= images.length - 1) {
-      newOffset = images.length - frameSize;
+    const maxOffset = Math.max(0, images.length - frameSize);
+
+    if (newOffset > maxOffset) {
+      newOffset = maxOffset;
     }
 
     if (newOffset < 0) {
@@ -52,6 +54,10 @@ const Carousel: React.FC<Props> = ({
     }
   }
 
+  const maxOffset = Math.max(0, images.length - frameSize);
+  const canGoNext = offset < maxOffset;
+  const canGoPrev = offset > 0;
+
   return (
     <div className="Carousel">
       <div
@@ -61,7 +67,7 @@ const Carousel: React.FC<Props> = ({
         <ul
           className="Carousel__list"
           style={{
-            width: 1300,
+            width: images.length * itemWidth,
             transition: `transform ${animationDuration}ms ease-in-out`,
           }}
           ref={listRef}
@@ -79,7 +85,7 @@ const Carousel: React.FC<Props> = ({
       <button
         type="button"
         onClick={() => scrollToImage(Direction.prev)}
-        disabled={offset === 0}
+        disabled={!canGoPrev}
       >
         Prev
       </button>
@@ -87,7 +93,7 @@ const Carousel: React.FC<Props> = ({
         data-cy="next"
         type="button"
         onClick={() => scrollToImage(Direction.next)}
-        disabled={offset === images.length - frameSize}
+        disabled={!canGoNext}
       >
         Next
       </button>
